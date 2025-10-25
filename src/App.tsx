@@ -97,7 +97,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>👕 Clothes Mockup Generator</h1>
+        <h1>👕 Clothes Mockup Generator - Long Tuyết</h1>
         <p>Tạo mockup áo thun đơn giản và nhanh chóng</p>
       </header>
 
