@@ -7,13 +7,27 @@ import { useImageTransform } from "./hooks/useImageTransform";
 
 function App() {
   const [designImage, setDesignImage] = useState<string | null>(null);
-  const [selectedBase, setSelectedBase] = useState<"black" | "white">("black");
+  const [selectedBase, setSelectedBase] = useState<
+    "black" | "white" | "black-hat" | "white-hat"
+  >("black");
   const [isMockupGenerated, setIsMockupGenerated] = useState(false);
   const { transform, setTransform, resetTransform } = useImageTransform();
 
+  const basePath = import.meta.env.BASE_URL ?? "/";
+
   const baseImages = {
-    black: "/images/base-black.png",
-    white: "/images/base-white.png",
+    black: `${basePath}images/base-black.png`,
+    white: `${basePath}images/base-white.png`,
+  };
+
+  const hatImages = {
+    "black-hat": `${basePath}images/hat-black.png`,
+    "white-hat": `${basePath}images/hat-white.png`,
+  };
+
+  const totalImages = {
+    ...baseImages,
+    ...hatImages,
   };
 
   const handleImageUpload = (imageUrl: string) => {
@@ -53,9 +67,23 @@ function App() {
 
     // Load and draw base image
     const baseImg = new Image();
-    baseImg.src = baseImages[selectedBase];
+    baseImg.src = totalImages[selectedBase];
     baseImg.onload = () => {
-      ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
+      // Draw base preserving aspect ratio (contain) to match preview
+      const img = baseImg;
+      const imgRatio = img.width / img.height;
+      const canvasRatio = canvas.width / canvas.height;
+      let targetW: number, targetH: number;
+      if (imgRatio > canvasRatio) {
+        targetW = canvas.width;
+        targetH = Math.round(canvas.width / imgRatio);
+      } else {
+        targetH = canvas.height;
+        targetW = Math.round(canvas.height * imgRatio);
+      }
+      const x = Math.round((canvas.width - targetW) / 2);
+      const y = Math.round((canvas.height - targetH) / 2);
+      ctx.drawImage(img, x, y, targetW, targetH);
 
       // Load and draw design image if available
       if (designImage) {
@@ -137,6 +165,30 @@ function App() {
             </div>
           </div>
 
+          <div className="hat-selector">
+            <h2>🧢 Chọn nón</h2>
+            <div className="hat-options">
+              <button
+                className={`hat-option ${
+                  selectedBase === "black-hat" ? "active" : ""
+                }`}
+                onClick={() => setSelectedBase("black-hat")}
+              >
+                <img src={hatImages["black-hat"]} alt="Black hat" />
+                <span>Đen</span>
+              </button>
+              <button
+                className={`hat-option ${
+                  selectedBase === "white-hat" ? "active" : ""
+                }`}
+                onClick={() => setSelectedBase("white-hat")}
+              >
+                <img src={hatImages["white-hat"]} alt="White hat" />
+                <span>Trắng</span>
+              </button>
+            </div>
+          </div>
+
           {designImage && !isMockupGenerated && (
             <div className="generate-section">
               <button
@@ -152,7 +204,7 @@ function App() {
         <div className="center-panel">
           <h2>🖼️ Mockup Preview</h2>
           <MockupCanvas
-            baseImage={baseImages[selectedBase]}
+            baseImage={totalImages[selectedBase]}
             designImage={isMockupGenerated ? designImage : null}
             transform={transform}
             onTransformChange={setTransform}

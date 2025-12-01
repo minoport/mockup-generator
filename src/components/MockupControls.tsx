@@ -33,7 +33,7 @@ const MockupControls: React.FC<MockupControlsProps> = ({
   const handleScaleButton = (delta: number) => {
     onTransformChange({
       ...transform,
-      scale: Math.max(0.1, Math.min(3, transform.scale + delta)),
+      scale: Math.max(0.01, Math.min(5, transform.scale + delta)),
     });
   };
 
@@ -49,18 +49,18 @@ const MockupControls: React.FC<MockupControlsProps> = ({
       <div className="control-section">
         <h3>🔍 Phóng to / Thu nhỏ</h3>
         <div className="control-group">
-          <button onClick={() => handleScaleButton(-0.01)}>−</button>
+          <button onClick={() => handleScaleButton(-0.02)}>−</button>
           <input
             type="range"
-            min="0.1"
-            max="3"
-            step="0.01"
+            min="0.01"
+            max="5"
+            step="0.005"
             value={transform.scale}
             onChange={handleScaleChange}
           />
-          <button onClick={() => handleScaleButton(0.01)}>+</button>
+          <button onClick={() => handleScaleButton(0.02)}>+</button>
           <span className="value-display">
-            {(transform.scale * 100).toFixed(0)}%
+            {(transform.scale * 100).toFixed(1)}%
           </span>
         </div>
       </div>

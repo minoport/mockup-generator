@@ -36,7 +36,23 @@ const MockupCanvas: React.FC<MockupCanvasProps> = ({
 
     // Draw base image
     if (baseImgRef.current) {
-      ctx.drawImage(baseImgRef.current, 0, 0, canvas.width, canvas.height);
+      const img = baseImgRef.current;
+      // Preserve aspect ratio when drawing base (contain)
+      const imgRatio = img.width / img.height;
+      const canvasRatio = canvas.width / canvas.height;
+      let targetW: number, targetH: number;
+      if (imgRatio > canvasRatio) {
+        // Image is wider relative to canvas -> fit to width
+        targetW = canvas.width;
+        targetH = Math.round(canvas.width / imgRatio);
+      } else {
+        // Image is taller relative -> fit to height
+        targetH = canvas.height;
+        targetW = Math.round(canvas.height * imgRatio);
+      }
+      const x = Math.round((canvas.width - targetW) / 2);
+      const y = Math.round((canvas.height - targetH) / 2);
+      ctx.drawImage(img, x, y, targetW, targetH);
     }
 
     // Draw design image with transformations
